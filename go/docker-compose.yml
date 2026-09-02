@@ -1,0 +1,149 @@
+version: '3.8'
+
+services:
+  # ==========================================
+  # Shard 0: Raft Group 0 (3 Nodes)
+  # ==========================================
+  node-1:
+    build: .
+    container_name: infocrate-node-1
+    command: >
+      --node-id=node-1
+      --shard-id=shard-0
+      --grpc-port=50051
+      --metrics-port=9091
+      --data-dir=/data
+      --peers=node-2,node-3
+    ports:
+      - "50051:50051"
+      - "9091:9091"
+    volumes:
+      - node1-data:/data
+    networks:
+      - infocrate-net
+
+  node-2:
+    build: .
+    container_name: infocrate-node-2
+    command: >
+      --node-id=node-2
+      --shard-id=shard-0
+      --grpc-port=50052
+      --metrics-port=9092
+      --data-dir=/data
+      --peers=node-1,node-3
+    ports:
+      - "50052:50052"
+      - "9092:9092"
+    volumes:
+      - node2-data:/data
+    networks:
+      - infocrate-net
+
+  node-3:
+    build: .
+    container_name: infocrate-node-3
+    command: >
+      --node-id=node-3
+      --shard-id=shard-0
+      --grpc-port=50053
+      --metrics-port=9093
+      --data-dir=/data
+      --peers=node-1,node-2
+    ports:
+      - "50053:50053"
+      - "9093:9093"
+    volumes:
+      - node3-data:/data
+    networks:
+      - infocrate-net
+
+  # ==========================================
+  # Shard 1: Raft Group 1 (3 Nodes)
+  # ==========================================
+  node-4:
+    build: .
+    container_name: infocrate-node-4
+    command: >
+      --node-id=node-4
+      --shard-id=shard-1
+      --grpc-port=50054
+      --metrics-port=9094
+      --data-dir=/data
+      --peers=node-5,node-6
+    ports:
+      - "50054:50054"
+      - "9094:9094"
+    volumes:
+      - node4-data:/data
+    networks:
+      - infocrate-net
+
+  node-5:
+    build: .
+    container_name: infocrate-node-5
+    command: >
+      --node-id=node-5
+      --shard-id=shard-1
+      --grpc-port=50055
+      --metrics-port=9095
+      --data-dir=/data
+      --peers=node-4,node-6
+    ports:
+      - "50055:50055"
+      - "9095:9095"
+    volumes:
+      - node5-data:/data
+    networks:
+      - infocrate-net
+
+  node-6:
+    build: .
+    container_name: infocrate-node-6
+    command: >
+      --node-id=node-6
+      --shard-id=shard-1
+      --grpc-port=50056
+      --metrics-port=9096
+      --data-dir=/data
+      --peers=node-4,node-5
+    ports:
+      - "50056:50056"
+      - "9096:9096"
+    volumes:
+      - node6-data:/data
+    networks:
+      - infocrate-net
+
+  # ==========================================
+  # Observability: Prometheus & Grafana
+  # ==========================================
+  prometheus:
+    image: prom/prometheus:v2.49.1
+    container_name: infocrate-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - infocrate-net
+
+  grafana:
+    image: grafana/grafana:10.3.3
+    container_name: infocrate-grafana
+    ports:
+      - "3001:3000"
+    networks:
+      - infocrate-net
+
+volumes:
+  node1-data:
+  node2-data:
+  node3-data:
+  node4-data:
+  node5-data:
+  node6-data:
+
+networks:
+  infocrate-net:
+    driver: bridge

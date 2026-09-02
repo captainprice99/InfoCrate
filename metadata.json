@@ -1,0 +1,6 @@
+{
+  "name": "InfoCrate",
+  "description": "Distributed, horizontally scalable linearizable key-value database with Raft consensus, LSM-Tree storage engine, and sharding.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
